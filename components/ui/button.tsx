@@ -10,6 +10,7 @@ interface ButtonProps {
   outline?: boolean;
   type?: "button" | "submit";
   onClick?: () => void;
+  classNames?: string;
 }
 const Button = ({
   label,
@@ -20,6 +21,7 @@ const Button = ({
   outline,
   type,
   onClick,
+  classNames,
 }: ButtonProps) => {
   return (
     <button
@@ -34,7 +36,7 @@ const Button = ({
         outline
           ? "bg-transparent border-slate-600 text-sky-500 hover:bg-slate-800/40"
           : "",
-        disabled ? "opacity-50 cursor-not-allowed" : ""
+        classNames
       )}
     >
       {label}

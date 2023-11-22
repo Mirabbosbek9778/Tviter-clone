@@ -1,5 +1,4 @@
-import React, { useCallback } from "react";
-import Modal from "../ui/Modal";
+import React, { useCallback, useState } from "react";
 import useLoginModal from "@/hooks/useLoginModal";
 import {
   Form,
@@ -15,10 +14,17 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/lib/validation";
 import useRegisterModal from "@/hooks/useRegisterModal";
+import axios from "axios";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertTitle, AlertDescription } from "../ui/alert";
+import { signIn } from "next-auth/react";
+import Modal from "../ui/Modal";
 
-const LoginModal = () => {
-  const registerModal = useRegisterModal();
+export default function LoginModal() {
+  const [error, setError] = useState("");
+
   const loginModal = useLoginModal();
+  const registerModal = useRegisterModal();
 
   const onToggle = useCallback(() => {
     loginModal.onClose();
@@ -32,8 +38,21 @@ const LoginModal = () => {
       email: "",
     },
   });
-  function onSubmit(values: z.infer<typeof loginSchema>) {
-    console.log(values);
+
+  async function onSubmit(values: z.infer<typeof loginSchema>) {
+    try {
+      const { data } = await axios.post("/api/auth/login", values);
+      if (data.success) {
+        signIn("credentials", values);
+        loginModal.onClose();
+      }
+    } catch (error: any) {
+      if (error.response.data.error) {
+        setError(error.response.data.error);
+      } else {
+        setError("Something went wrong. Please try again later.");
+      }
+    }
   }
 
   const { isSubmitting } = form.formState;
@@ -41,6 +60,13 @@ const LoginModal = () => {
   const bodyContent = (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 px-12">
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
         <FormField
           control={form.control}
           name="email"
@@ -66,7 +92,7 @@ const LoginModal = () => {
           )}
         />
         <Button
-          label={"Register  "}
+          label={"Login"}
           type="submit"
           secondary
           fullWidth
@@ -78,21 +104,20 @@ const LoginModal = () => {
   );
 
   const footer = (
-    <>
-      <div className="text-neutral-400 text-center mb-4">
-        <p>
-          First time using X?
-          <span
-            className="text-white cursor-pointer hover:underline"
-            onClick={onToggle}
-          >
-            {" "}
-            Create an account
-          </span>
-        </p>
-      </div>
-    </>
+    <div className="text-neutral-400 text-center mb-4">
+      <p>
+        First time using X?
+        <span
+          className="text-white cursor-pointer hover:underline"
+          onClick={onToggle}
+        >
+          {" "}
+          Create an account
+        </span>
+      </p>
+    </div>
   );
+
   return (
     <Modal
       isOpen={loginModal.isOpen}
@@ -101,6 +126,4 @@ const LoginModal = () => {
       footer={footer}
     />
   );
-};
-
-export default LoginModal;
+}
