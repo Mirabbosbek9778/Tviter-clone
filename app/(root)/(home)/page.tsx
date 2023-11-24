@@ -25,7 +25,6 @@ const Page = () => {
         setPosts(data);
         setisLoading(false);
       } catch (e) {
-        console.log(e);
         setisLoading(false);
       }
     };
@@ -34,7 +33,7 @@ const Page = () => {
   }, []);
   return (
     <>
-      <Header label="Home" isBack />
+      <Header label="Home" />
       {isLoading || status === "loading" ? (
         <div className="flex justify-center items-center h-24">
           <Loader2 className="animate-spin text-sky-500" />
@@ -44,9 +43,15 @@ const Page = () => {
           <Form
             placeholder="what is on your mind?"
             user={JSON.parse(JSON.stringify(session.currentUser))}
+            setPosts={setPosts}
           />
           {posts.map((post) => (
-            <PostItem key={post._id} post={post} />
+            <PostItem
+              key={post._id}
+              post={post}
+              user={JSON.parse(JSON.stringify(session.currentUser))}
+              setPosts={setPosts}
+            />
           ))}
         </>
       )}

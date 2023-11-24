@@ -1,15 +1,16 @@
 import Auth from "@/components/auth";
-import { Toaster } from "@/components/ui/toaster";
-import { authOptions } from "@/lib/authOptions";
 import { getServerSession } from "next-auth";
 import React from "react";
+import { Toaster } from "@/components/ui/toaster";
 import NextTopLoader from "nextjs-toploader";
+import { authOptions } from "@/lib/authOptions";
 import Sidebar from "@/components/sidebar/Sidebar";
 import FollowBar from "@/components/shared/FollowBar";
 
 interface Props {
   children: React.ReactNode;
 }
+
 const Layout = async ({ children }: Props) => {
   const session: any = await getServerSession(authOptions);
 
@@ -20,6 +21,7 @@ const Layout = async ({ children }: Props) => {
       </div>
     );
   }
+
   return (
     <div className="lg:container h-screen mx-auto lg:max-w-7xl">
       <div className="flex">

@@ -1,9 +1,10 @@
 import { AuthOptions } from "next-auth";
 import User from "@/database/user.model";
-import { connectToDatabase } from "./mongoose";
+
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { connectToDatabase } from "./mongoose";
 
 export const authOptions: AuthOptions = {
   providers: [

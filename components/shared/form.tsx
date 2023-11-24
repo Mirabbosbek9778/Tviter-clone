@@ -10,28 +10,46 @@ import axios from "axios";
 interface Props {
   placeholder: string;
   user: IUser;
-  //   setPosts: Dispatch<SetStateAction<IPost[]>>;
-  //   postId?: string;
-  //   isComment?: boolean;
+  setPosts: Dispatch<SetStateAction<IPost[]>>;
+  postId?: string;
+  isComment?: boolean;
 }
-const Form = ({ placeholder, user }: Props) => {
+const Form = ({ placeholder, user, setPosts, postId, isComment }: Props) => {
   const [body, setBody] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async () => {
     try {
       setIsLoading(true);
-
-      const { data } = await axios.post("/api/posts", {
-        body,
-        userId: user._id,
-      });
+      if (isComment) {
+        const { data } = await axios.post("/api/comments", {
+          body,
+          userId: user._id,
+          postId,
+        });
+        const newComment = {
+          ...data,
+          user,
+          likes: 0,
+          hasLiked: false,
+        };
+        setPosts((prev) => [newComment, ...prev]);
+      } else {
+        const { data } = await axios.post("/api/posts", {
+          body,
+          userId: user._id,
+        });
+        const newPost = {
+          ...data,
+          user,
+          likes: 0,
+          hasLiked: false,
+          comments: 0,
+        };
+        setPosts((prev) => [newPost, ...prev]);
+      }
       setIsLoading(false);
       setBody("");
-      toast({
-        title: "Success",
-        description: "Your post has been created successfully",
-      });
     } catch (e) {
       setIsLoading(false);
       toast({
@@ -62,7 +80,7 @@ const Form = ({ placeholder, user }: Props) => {
 
           <div className="mt-4 flex flex-row justify-end">
             <Button
-              label={"Post"}
+              label={isComment ? "Reply" : "Post"}
               classNames="px-8"
               disabled={isLoading || !body}
               onClick={onSubmit}
