@@ -20,17 +20,18 @@ const Page = () => {
     const getPosts = async () => {
       try {
         setisLoading(true);
-
-        const { data } = await axios.get("/api/posts?limit=10");
+        const { data } = await axios.get("/api/posts?limit=20");
         setPosts(data);
         setisLoading(false);
-      } catch (e) {
+      } catch (error) {
+        console.log(error);
         setisLoading(false);
       }
     };
 
     getPosts();
   }, []);
+
   return (
     <>
       <Header label="Home" />
